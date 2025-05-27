@@ -1,0 +1,28 @@
+version: '3'
+
+vars:
+  PYTHON_VERSION: 3.13
+  VENV_NAME: .venv
+  KERNEL_NAME: myenv
+  DISPLAY_NAME: Python (myenv)
+
+tasks:
+  setup:
+    desc: Create virtualenv, install dependencies, register Jupyter kernel
+    cmds:
+      - rm -rf {{.VENV_NAME}}
+      - uv venv {{.VENV_NAME}} -p {{.PYTHON_VERSION}}
+      - source {{.VENV_NAME}}/bin/activate && uv pip install -U \
+          jupyterlab ipykernel pandas numpy matplotlib openai huggingface_hub
+      - source {{.VENV_NAME}}/bin/activate && python -m ipykernel install --user --name={{.KERNEL_NAME}} --display-name="{{.DISPLAY_NAME}}"
+
+  lab:
+    desc: Launch JupyterLab
+    cmds:
+      - source {{.VENV_NAME}}/bin/activate && jupyter lab
+
+  clean:
+    desc: Remove virtual environment
+    cmds:
+      - rm -rf {{.VENV_NAME}}
+
